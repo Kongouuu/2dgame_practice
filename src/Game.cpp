@@ -1,7 +1,6 @@
-#include "./Game.h"
-
 #include <iostream>
 
+#include "./Game.h"
 #include "./Constants.h"
 
 // Constructor
@@ -16,8 +15,8 @@ Game::~Game() {
 // Dummy variable
 float projectilePosX = 0.0f;
 float projectilePosY = 0.0f;
-float projectileVelX = 1.0f;
-float projectileVelY = 1.0f;
+float projectileVelX = 40.0f;
+float projectileVelY = 30.0f;
 
 // Getter of isRunning state
 bool Game::IsRunning() const {
@@ -85,8 +84,18 @@ void Game::ProcessInput() {
 };
 
 void Game::Update() {
-    projectilePosX += projectileVelX;
-    projectilePosY += projectileVelY;
+    // Wait until 16ms if last frame is too fast
+    while(!SDL_TICKS_PASSED(SDL_GetTicks(),ticksLastFrame+FRAME_TARGET_TIME));
+    // Time passed in ticks since last frame
+    float deltaTime = (SDL_GetTicks() - ticksLastFrame) / 1000.0f;
+
+    // Set maximum delta time
+    deltaTime = (deltaTime > 0.05f) ? 0.05f : deltaTime;
+
+    // Record current tick
+    ticksLastFrame = SDL_GetTicks();
+    projectilePosX += projectileVelX * deltaTime;
+    projectilePosY += projectileVelY * deltaTime;
 }
 
 void Game::Render() {

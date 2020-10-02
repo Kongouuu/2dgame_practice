@@ -8,6 +8,7 @@
 class Game {
     private:
         bool isRunning;
+        int ticksLastFrame;
         SDL_Window *window;     // window of game
         SDL_Renderer *renderer; // renderer of game
 
