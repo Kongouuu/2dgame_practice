@@ -1,7 +1,8 @@
 #include <iostream>
-
 #include "./Game.h"
-#include "./Constants.h"
+
+EntityManager manager;
+SDL_Renderer* Game::renderer;
 
 // Constructor
 Game::Game() {
@@ -12,11 +13,9 @@ Game::Game() {
 Game::~Game() {
 }
 
-// Dummy variable
-float projectilePosX = 0.0f;
-float projectilePosY = 0.0f;
-float projectileVelX = 40.0f;
-float projectileVelY = 30.0f;
+// Vector in glm library
+glm::vec2 projectilePos = glm::vec2(0.0f, 0.0f);
+glm::vec2 projectileVel = glm::vec2(40.0f, 30.0f);
 
 // Getter of isRunning state
 bool Game::IsRunning() const {
@@ -39,7 +38,9 @@ void Game::Initialize(int width, int height) {
         SDL_WINDOWPOS_CENTERED,  // y position of window
         width,
         height,
-        SDL_WINDOW_BORDERLESS);
+        0
+    );
+
     if (!window) {
         std::cerr << "Error creating SDL window." << std::endl;
         return;
@@ -85,7 +86,8 @@ void Game::ProcessInput() {
 
 void Game::Update() {
     // Wait until 16ms if last frame is too fast
-    while(!SDL_TICKS_PASSED(SDL_GetTicks(),ticksLastFrame+FRAME_TARGET_TIME));
+    while (!SDL_TICKS_PASSED(SDL_GetTicks(), ticksLastFrame + FRAME_TARGET_TIME))0;
+
     // Time passed in ticks since last frame
     float deltaTime = (SDL_GetTicks() - ticksLastFrame) / 1000.0f;
 
@@ -94,8 +96,12 @@ void Game::Update() {
 
     // Record current tick
     ticksLastFrame = SDL_GetTicks();
-    projectilePosX += projectileVelX * deltaTime;
-    projectilePosY += projectileVelY * deltaTime;
+
+    // Update projectile position
+    projectilePos = glm::vec2(
+        projectilePos.x + projectileVel.y * deltaTime,
+        projectilePos.y + projectileVel.y * deltaTime
+    );
 }
 
 void Game::Render() {
@@ -105,16 +111,16 @@ void Game::Render() {
     SDL_RenderClear(renderer);
 
     // Struct a rectangle
-    SDL_Rect projectile {
-        (int)projectilePosX,
-        (int)projectilePosY,
+    SDL_Rect projectile{
+        (int)projectilePos.x,
+        (int)projectilePos.y,
         10,
         10
     };
-    
+
     // *** Draw the rectangle ***
     // Set color of rectangle
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255 ,255);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, &projectile);
 
     SDL_RenderPresent(renderer);
