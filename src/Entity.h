@@ -3,8 +3,10 @@
 
 #include <vector>
 #include <string>
-#include "./EntityManager.h"
 #include "./Component.h"
+
+class EntityManager;
+class Component;
 
 class Entity {
     private:
@@ -21,6 +23,15 @@ class Entity {
         void Render();
         void Destroy();
         bool IsActive() const;
+
+        template <typename T, typename... TArgs>
+        T& AddComponent(TArgs&&... args){
+            T* newComponent(new T(std::forward<TArgs>(args)...));
+            newComponent->owner = this;
+            components.emplace_back(newComponent);
+            newComponent->Initialize();
+            return *newComponent;
+        }
 };
 
 #endif

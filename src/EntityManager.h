@@ -2,9 +2,8 @@
 #define ENTITYMANAGER_H
 
 #include <vector>
-#include <string>
-#include "./Component.h"
-#include "./Entity.h"
+#include "Entity.h"
+#include "Component.h"
 
 class EntityManager {
     private:

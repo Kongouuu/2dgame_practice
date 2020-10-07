@@ -1,5 +1,6 @@
 #include <iostream>
 #include "./Game.h"
+#include "./Components/TransformComponent.h"
 
 EntityManager manager;
 SDL_Renderer* Game::renderer;
@@ -14,8 +15,7 @@ Game::~Game() {
 }
 
 // Vector in glm library
-glm::vec2 projectilePos = glm::vec2(0.0f, 0.0f);
-glm::vec2 projectileVel = glm::vec2(40.0f, 30.0f);
+
 
 // Getter of isRunning state
 bool Game::IsRunning() const {
@@ -55,10 +55,16 @@ void Game::Initialize(int width, int height) {
         return;
     }
 
+    LoadLevel(0);
     // If no error, set running to true
     isRunning = true;
     return;
 };
+
+void Game::LoadLevel(int levelNumber){
+    Entity& newEntity(manager.AddEntity("Projectile1"));
+    newEntity.AddComponent<TransformComponent>(0,0,20,20,32,32,1);
+}
 
 // Input processor
 void Game::ProcessInput() {
@@ -98,10 +104,7 @@ void Game::Update() {
     ticksLastFrame = SDL_GetTicks();
 
     // Update projectile position
-    projectilePos = glm::vec2(
-        projectilePos.x + projectileVel.y * deltaTime,
-        projectilePos.y + projectileVel.y * deltaTime
-    );
+    manager.Update(deltaTime);
 }
 
 void Game::Render() {
@@ -109,20 +112,10 @@ void Game::Render() {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     // Clear back buffer [SDL has double buffer]
     SDL_RenderClear(renderer);
-
-    // Struct a rectangle
-    SDL_Rect projectile{
-        (int)projectilePos.x,
-        (int)projectilePos.y,
-        10,
-        10
-    };
-
-    // *** Draw the rectangle ***
-    // Set color of rectangle
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderFillRect(renderer, &projectile);
-
+    if(manager.HasNoEntities()){
+        return;
+    }
+    manager.Render();
     SDL_RenderPresent(renderer);
 };
 
