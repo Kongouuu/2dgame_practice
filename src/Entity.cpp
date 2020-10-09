@@ -1,5 +1,5 @@
 #include "./Entity.h"
-
+#include <iostream>
 // Constructor
 Entity::Entity(EntityManager& manager) : manager(manager) {  // <- Cpp style initialize
     this->isActive = true;
@@ -25,6 +25,12 @@ void Entity::Render() {
 
 void Entity::Destroy() {
     this->isActive = false;
+}
+
+void Entity::LeaseComponent() {
+    for (auto& component : components) {
+        component->Lease();
+    }
 }
 
 bool Entity::IsActive() const {

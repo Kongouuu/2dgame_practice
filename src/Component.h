@@ -1,7 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
-#include "Entity.h"
+class Entity;
 
 class Component {
    public:
@@ -12,6 +12,7 @@ class Component {
     virtual void Initialize() {}
     virtual void Update(float deltaTime) {}
     virtual void Render() {}
+    virtual void Lease() {}
 };
 
 #endif

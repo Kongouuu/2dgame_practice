@@ -35,3 +35,10 @@ std::vector<Entity*> EntityManager::GetEntities() const {
 unsigned int EntityManager::GetEntityCount() {
     return entities.size();
 }
+
+void EntityManager::LeaseEntity(){
+    for (auto& entity :entities){
+        std::cout<<"Entity Name: "<<entity->name<<std::endl;
+        entity->LeaseComponent();
+    }
+}

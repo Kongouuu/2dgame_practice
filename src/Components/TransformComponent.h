@@ -45,6 +45,10 @@ class TransformComponent: public Component {
             SDL_SetRenderDrawColor(Game::renderer, 255,255,255,255);
             SDL_RenderFillRect(Game::renderer,&transformRectangle);
         }
+        
+        void Lease() override {
+            std::cout<<"        Component<TransformComponent>"<<std::endl;
+        }
 };
 
 #endif

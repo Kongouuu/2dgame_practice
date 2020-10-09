@@ -56,14 +56,19 @@ void Game::Initialize(int width, int height) {
     }
 
     LoadLevel(0);
+    manager.LeaseEntity();
     // If no error, set running to true
     isRunning = true;
     return;
 };
 
 void Game::LoadLevel(int levelNumber){
-    Entity& newEntity(manager.AddEntity("Projectile1"));
-    newEntity.AddComponent<TransformComponent>(0,0,20,20,32,32,1);
+    Entity& projectile1(manager.AddEntity("Projectile1"));
+    projectile1.AddComponent<TransformComponent>(0,0,20,20,32,32,1);
+    Entity& projectile2(manager.AddEntity("Projectile2"));
+    projectile2.AddComponent<TransformComponent>(800,500,-30,0,32,32,1);
+    Entity& projectile3(manager.AddEntity("Projectile3"));
+    projectile3.AddComponent<TransformComponent>(400,300,0,20,16,32,1);
 }
 
 // Input processor
