@@ -78,11 +78,11 @@ void Game::LoadLevel(int levelNumber){
 
     Entity& chopperEntity(manager.AddEntity("Chopper"));
     chopperEntity.AddComponent<TransformComponent>(300,300,0,30,32,32,1);
-    chopperEntity.AddComponent<SpriteComponent>("chopper-image",2,90,true,false); // (assetID, frames, speed, animated, fixed)
+    chopperEntity.AddComponent<SpriteComponent>("chopper-image",2,90,true,false); // (assetID, frames, speed, direction, fixed)
 
     Entity& radarEntity(manager.AddEntity("Radar"));
     radarEntity.AddComponent<TransformComponent>(720,15,0,0,64,64,1);
-    radarEntity.AddComponent<SpriteComponent>("radar-image",8,300,true,true);
+    radarEntity.AddComponent<SpriteComponent>("radar-image",8,300,false,true);
     
 }
 

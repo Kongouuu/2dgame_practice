@@ -33,15 +33,15 @@ class SpriteComponent : public Component {
         SetTexture(assetTextureId);
     }
 
-    // Animating sprite
+    // Animating sprite, the problem is with fixed numFrames and animationSpeed
     SpriteComponent(const char* assetTextureId, int numFrames, int animationSpeed, bool hasDirection, bool isFixed)
         : numFrames(numFrames), animationSpeed(animationSpeed), isFixed(isFixed) {
         this->isAnimated = true;
         if (hasDirection) {
             /* 
              * It seems like a waste to add an object of redundant "numFrames" "animation Speed
-             * That is because so far the engine only deals with 4 direction movement
-             * Later on, when adding animation of different frames/speed, it will do a lot
+             * If the program wants to have an object with different animations of different frame/speed
+             * The constructure should NOT be designed this way
              */
             Animation downAnimation = Animation(0, numFrames, animationSpeed);
             Animation rightAnimation = Animation(1, numFrames, animationSpeed);
@@ -53,23 +53,27 @@ class SpriteComponent : public Component {
             animations["LeftAnimation"] = leftAnimation;
             animations["UpAnimation"] = upAnimation;
             this->animationIndex = 0;
+            // Initialize with down
             this->currentAnimationName = "DownAnimation";
         } else {
+            // Objects without direction
             Animation singleAnimation = Animation(0, numFrames, animationSpeed);
             animations["SingleAnimation"] = singleAnimation;
             this->animationIndex = 0;
             this->currentAnimationName = "SingleAnimation";
         }
-        Play(this->currentAnimationName);
+
+        // Play(this->currentAnimationName)  <------ WHY implement this? WHY?
         SetTexture(assetTextureId);
     }
 
-    void Play(std::string animationName) {
-        numFrames = animations[animationName].numFrames;
-        animationIndex = animations[animationName].index;
-        animationSpeed = animations[animationName].animationSpeed;
-        currentAnimationName = animationName;
-    }
+    // Useless function that the course tells me to implement
+    // void Play(std::string animationName) {
+    //     this->numFrames = animations[animationName].numFrames;
+    //     this->animationIndex = animations[animationName].index;
+    //     this->animationSpeed = animations[animationName].animationSpeed;
+    //     this->currentAnimationName = animationName;
+    // }
 
     void SetTexture(std::string assetTextureId) {
         texture = Game::assetManager->GetTexture(assetTextureId);
