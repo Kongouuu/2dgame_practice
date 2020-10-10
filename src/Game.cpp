@@ -1,8 +1,11 @@
 #include <iostream>
 #include "./Game.h"
+#include "./AssetManager.h"
 #include "./Components/TransformComponent.h"
+#include "./Components/SpriteComponent.h"
 
 EntityManager manager;
+AssetManager* Game::assetManager = new AssetManager(&manager);
 SDL_Renderer* Game::renderer;
 
 // Constructor
@@ -56,19 +59,31 @@ void Game::Initialize(int width, int height) {
     }
 
     LoadLevel(0);
-    manager.LeaseEntity();
+    manager.ListEntity();
     // If no error, set running to true
     isRunning = true;
     return;
 };
 
 void Game::LoadLevel(int levelNumber){
-    Entity& projectile1(manager.AddEntity("Projectile1"));
-    projectile1.AddComponent<TransformComponent>(0,0,20,20,32,32,1);
-    Entity& projectile2(manager.AddEntity("Projectile2"));
-    projectile2.AddComponent<TransformComponent>(800,500,-30,0,32,32,1);
-    Entity& projectile3(manager.AddEntity("Projectile3"));
-    projectile3.AddComponent<TransformComponent>(400,300,0,20,16,32,1);
+    // Load assets
+    assetManager->AddTexture("tank-image", std::string("./assets/images/tank-big-right.png").c_str());
+    assetManager->AddTexture("chopper-image", std::string("./assets/images/chopper-spritesheet.png").c_str());
+    assetManager->AddTexture("radar-image", std::string("./assets/images/radar.png").c_str());
+
+    // Adding entities&components
+    Entity& tankEntity(manager.AddEntity("Tank"));
+    tankEntity.AddComponent<TransformComponent>(0,0,20,20,32,32,1);
+    tankEntity.AddComponent<SpriteComponent>("tank-image",true);
+
+    Entity& chopperEntity(manager.AddEntity("Chopper"));
+    chopperEntity.AddComponent<TransformComponent>(300,300,0,30,32,32,1);
+    chopperEntity.AddComponent<SpriteComponent>("chopper-image",2,90,true,false); // (assetID, frames, speed, animated, fixed)
+
+    Entity& radarEntity(manager.AddEntity("Radar"));
+    radarEntity.AddComponent<TransformComponent>(720,15,0,0,64,64,1);
+    radarEntity.AddComponent<SpriteComponent>("radar-image",8,300,true,true);
+    
 }
 
 // Input processor

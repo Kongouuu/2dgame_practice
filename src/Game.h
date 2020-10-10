@@ -9,6 +9,7 @@
 #include "./Component.h"
 #include "./EntityManager.h"
 
+class AssetManager;
 
 class Game {
     private:
@@ -19,6 +20,7 @@ class Game {
     public:
         Game(); //Constructor
         ~Game(); //Destructor
+        static AssetManager * assetManager;
         static SDL_Renderer *renderer; // renderer of game
         void LoadLevel(int levelNumber);
         bool IsRunning() const;

@@ -36,9 +36,9 @@ unsigned int EntityManager::GetEntityCount() {
     return entities.size();
 }
 
-void EntityManager::LeaseEntity(){
+void EntityManager::ListEntity() const{
     for (auto& entity :entities){
         std::cout<<"Entity Name: "<<entity->name<<std::endl;
-        entity->LeaseComponent();
+        entity->ListComponent();
     }
 }

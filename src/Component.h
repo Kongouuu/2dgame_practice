@@ -12,7 +12,7 @@ class Component {
     virtual void Initialize() {}
     virtual void Update(float deltaTime) {}
     virtual void Render() {}
-    virtual void Lease() {}
+    virtual void List() {}
 };
 
 #endif

@@ -12,5 +12,7 @@ SDL_Texture* TextureManager::LoadTexture(const char* fileName){
 
 void TextureManager::Draw(SDL_Texture* texture, SDL_Rect sourceRect, SDL_Rect destinationRect, SDL_RendererFlip flip){
     // Renderer, texture, source(from texture), destination (from renderer),angle, center, flip
+    // The &source rect is how much from the texture paper (usualy many textures on one paper)
+    // The destinationRect is what is originally rendering
     SDL_RenderCopyEx(Game::renderer, texture, &sourceRect, &destinationRect, 0, 0, flip);
 }

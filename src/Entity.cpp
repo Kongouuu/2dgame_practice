@@ -27,9 +27,9 @@ void Entity::Destroy() {
     this->isActive = false;
 }
 
-void Entity::LeaseComponent() {
+void Entity::ListComponent() const {
     for (auto& component : components) {
-        component->Lease();
+        component->List();
     }
 }
 

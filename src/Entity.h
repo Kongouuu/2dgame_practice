@@ -23,7 +23,7 @@ class Entity {
         void Update(float deltaTime);
         void Render();
         void Destroy();
-        void LeaseComponent();
+        void ListComponent() const;
         bool IsActive() const;
 
         template <typename T, typename... TArgs>
@@ -40,7 +40,12 @@ class Entity {
         template <typename T>
         T* GetComponent() {
             // make more safe?
-            return static_cast<T*> componentTypeMap[&typeid(T)];
+            return static_cast<T*> (componentTypeMap[&typeid(T)]);
+        }
+
+        template <typename T>
+        bool HasComponent() const {
+            return componentTypeMap.count(&typeid(T));
         }
 
 };
