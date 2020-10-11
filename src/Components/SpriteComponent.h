@@ -68,12 +68,12 @@ class SpriteComponent : public Component {
     }
 
     // Useless function that the course tells me to implement
-    // void Play(std::string animationName) {
-    //     this->numFrames = animations[animationName].numFrames;
-    //     this->animationIndex = animations[animationName].index;
-    //     this->animationSpeed = animations[animationName].animationSpeed;
-    //     this->currentAnimationName = animationName;
-    // }
+    void Play(std::string animationName) {
+        this->numFrames = animations[animationName].numFrames;
+        this->animationIndex = animations[animationName].index;
+        this->animationSpeed = animations[animationName].animationSpeed;
+        this->currentAnimationName = animationName;
+    }
 
     void SetTexture(std::string assetTextureId) {
         texture = Game::assetManager->GetTexture(assetTextureId);
@@ -92,8 +92,11 @@ class SpriteComponent : public Component {
     void Update(float deltaTime) override {
         // This is static way of doing (int)value  ---- static_cast<int>(value)
         if (isAnimated) {
+            // (Current tick / speed) % frames, ensures the frame NOT changing
+            //  When (cur_tick - last_tick) < speed
             sourceRect.x = sourceRect.w * static_cast<int>((SDL_GetTicks() / animationSpeed) % numFrames);
         }
+        // Y will be used after key binding
         sourceRect.y = animationIndex * transform->height;
         destinationRect.x = static_cast<int>(transform->position.x);
         destinationRect.y = static_cast<int>(transform->position.y);

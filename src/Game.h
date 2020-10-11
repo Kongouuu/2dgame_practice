@@ -21,6 +21,7 @@ class Game {
         Game(); //Constructor
         ~Game(); //Destructor
         static AssetManager * assetManager;
+        static SDL_Event event; // input
         static SDL_Renderer *renderer; // renderer of game
         void LoadLevel(int levelNumber);
         bool IsRunning() const;

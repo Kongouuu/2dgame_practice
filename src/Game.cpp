@@ -3,10 +3,12 @@
 #include "./AssetManager.h"
 #include "./Components/TransformComponent.h"
 #include "./Components/SpriteComponent.h"
+#include "./Components/KeyboardControlComponent.h"
 
 EntityManager manager;
 AssetManager* Game::assetManager = new AssetManager(&manager);
 SDL_Renderer* Game::renderer;
+SDL_Event Game::event;
 
 // Constructor
 Game::Game() {
@@ -77,8 +79,9 @@ void Game::LoadLevel(int levelNumber){
     tankEntity.AddComponent<SpriteComponent>("tank-image",true);
 
     Entity& chopperEntity(manager.AddEntity("Chopper"));
-    chopperEntity.AddComponent<TransformComponent>(300,300,0,30,32,32,1);
+    chopperEntity.AddComponent<TransformComponent>(300,300,0,0,32,32,1);
     chopperEntity.AddComponent<SpriteComponent>("chopper-image",2,90,true,false); // (assetID, frames, speed, direction, fixed)
+    chopperEntity.AddComponent<KeyboardControlComponent>("up","down","left","right","fire");
 
     Entity& radarEntity(manager.AddEntity("Radar"));
     radarEntity.AddComponent<TransformComponent>(720,15,0,0,64,64,1);
@@ -88,7 +91,6 @@ void Game::LoadLevel(int levelNumber){
 
 // Input processor
 void Game::ProcessInput() {
-    SDL_Event event;
     SDL_PollEvent(&event);
 
     switch (event.type) {
