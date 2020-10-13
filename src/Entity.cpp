@@ -5,8 +5,8 @@ Entity::Entity(EntityManager& manager) : manager(manager) {  // <- Cpp style ini
     this->isActive = true;
 }
 
-Entity::Entity(EntityManager& manager, std::string name)
-    : manager(manager), name(name) {  // <- Cpp style initialize
+Entity::Entity(EntityManager& manager, std::string name, LayerType layer)
+    : manager(manager), name(name), layer(layer) {  // <- Cpp style initialize
     this->isActive = true;
 }
 

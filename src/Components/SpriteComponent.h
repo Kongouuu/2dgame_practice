@@ -98,8 +98,11 @@ class SpriteComponent : public Component {
         }
         // Y will be used after key binding
         sourceRect.y = animationIndex * transform->height;
-        destinationRect.x = static_cast<int>(transform->position.x);
-        destinationRect.y = static_cast<int>(transform->position.y);
+        // camera.x = playerPos->position.x - (WINDOW_WIDTH/2);
+        // The below now is position.x - position.x + window_width/2
+        // Always in middle!
+        destinationRect.x = static_cast<int>(transform->position.x)- (isFixed?0:Game::camera.x);
+        destinationRect.y = static_cast<int>(transform->position.y)- (isFixed?0:Game::camera.y);
         destinationRect.w = transform->width * transform->scale;
         destinationRect.h = transform->height * transform->scale;
     }

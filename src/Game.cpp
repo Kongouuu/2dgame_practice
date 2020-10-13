@@ -4,12 +4,15 @@
 #include "./Components/TransformComponent.h"
 #include "./Components/SpriteComponent.h"
 #include "./Components/KeyboardControlComponent.h"
+#include "./Map.h"
 
 EntityManager manager;
 AssetManager* Game::assetManager = new AssetManager(&manager);
 SDL_Renderer* Game::renderer;
 SDL_Event Game::event;
+SDL_Rect Game::camera = {0,0,WINDOW_WIDTH,WINDOW_HEIGHT};
 
+Map* map;
 // Constructor
 Game::Game() {
     isRunning = false;
@@ -59,7 +62,7 @@ void Game::Initialize(int width, int height) {
         std::cerr << "Error creating SDL renderer." << std::endl;
         return;
     }
-
+ 
     LoadLevel(0);
     manager.ListEntity();
     // If no error, set running to true
@@ -67,23 +70,29 @@ void Game::Initialize(int width, int height) {
     return;
 };
 
+Entity& player(manager.AddEntity("Chopper", PLAYER_LAYER ));
+
 void Game::LoadLevel(int levelNumber){
     // Load assets
     assetManager->AddTexture("tank-image", std::string("./assets/images/tank-big-right.png").c_str());
     assetManager->AddTexture("chopper-image", std::string("./assets/images/chopper-spritesheet.png").c_str());
     assetManager->AddTexture("radar-image", std::string("./assets/images/radar.png").c_str());
+    assetManager->AddTexture("jungle-map", std::string("./assets/tilemaps/jungle.png").c_str());
+
+    // Add map
+    map = new Map("jungle-map",2,32);
+    map->LoadMap("./assets/tilemaps/jungle.map",25,20);
 
     // Adding entities&components
-    Entity& tankEntity(manager.AddEntity("Tank"));
+    Entity& tankEntity(manager.AddEntity("Tank",ENEMY_LAYER));
     tankEntity.AddComponent<TransformComponent>(0,0,20,20,32,32,1);
     tankEntity.AddComponent<SpriteComponent>("tank-image",true);
 
-    Entity& chopperEntity(manager.AddEntity("Chopper"));
-    chopperEntity.AddComponent<TransformComponent>(300,300,0,0,32,32,1);
-    chopperEntity.AddComponent<SpriteComponent>("chopper-image",2,90,true,false); // (assetID, frames, speed, direction, fixed)
-    chopperEntity.AddComponent<KeyboardControlComponent>("up","down","left","right","fire");
+    player.AddComponent<TransformComponent>(400,300,0,0,32,32,1);
+    player.AddComponent<SpriteComponent>("chopper-image",2,90,true,false); // (assetID, frames, speed, direction, fixed)
+    player.AddComponent<KeyboardControlComponent>("up","down","left","right","fire");
 
-    Entity& radarEntity(manager.AddEntity("Radar"));
+    Entity& radarEntity(manager.AddEntity("Radar",UI_LAYER));
     radarEntity.AddComponent<TransformComponent>(720,15,0,0,64,64,1);
     radarEntity.AddComponent<SpriteComponent>("radar-image",8,300,false,true);
     
@@ -127,6 +136,8 @@ void Game::Update() {
 
     // Update projectile position
     manager.Update(deltaTime);
+
+    HandleCameraMovement();
 }
 
 void Game::Render() {
@@ -140,6 +151,21 @@ void Game::Render() {
     manager.Render();
     SDL_RenderPresent(renderer);
 };
+
+void Game::HandleCameraMovement(){
+    TransformComponent *playerPos = player.GetComponent<TransformComponent>();
+    // Keep the player in the middle of the screen 
+    camera.x = playerPos->position.x - (WINDOW_WIDTH/2);
+    camera.y = playerPos->position.y - (WINDOW_HEIGHT/2);
+
+    // If player position - half window < 0, dont move camera
+    camera.x = camera.x<0?0:camera.x;
+    camera.y = camera.y<0?0:camera.y;
+    // If reached outer border, stop camera at outer border
+    camera.x = playerPos->position.x + (WINDOW_WIDTH/2)>map->GetWidth()?map->GetWidth() - WINDOW_WIDTH:camera.x;
+    camera.y = playerPos->position.y + (WINDOW_HEIGHT/2)>map->GetHeight()?map->GetHeight() - WINDOW_HEIGHT:camera.y;
+
+}
 
 void Game::Destroy() {
     SDL_DestroyRenderer(renderer);
