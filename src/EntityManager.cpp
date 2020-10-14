@@ -1,4 +1,7 @@
 #include "./EntityManager.h"
+#include "./Game.h"
+#include "./Collision.h"
+#include "./Components/ColliderComponent.h"
 
 void EntityManager::ClearData(){
     for (auto& entity : entities){
@@ -54,4 +57,20 @@ void EntityManager::ListEntity() const{
             std::cout<<"Entity Name: "<<entity->name<<std::endl;
         entity->ListComponent();
     }
+}
+
+std::string EntityManager::CheckCollision(Entity &subjectEntity){
+    ColliderComponent* subjectCollider = subjectEntity.GetComponent<ColliderComponent>();
+    for (auto& entity : entities){
+        // Even though Tile should not have collision component
+        if(entity->name == "Tile" || entity->name == "Player")
+            continue;
+        // In this game so far, only "enemy&projectile" will collide
+        if(entity->HasComponent<ColliderComponent>()){
+            ColliderComponent* otherCollider = entity->GetComponent<ColliderComponent>();
+            if(Collision::CheckCollision(subjectCollider->collider, otherCollider->collider))
+                return otherCollider->tag;
+        }
+    }
+    return "";
 }
