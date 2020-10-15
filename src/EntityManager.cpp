@@ -20,7 +20,7 @@ void EntityManager::Update(float deltaTime){
 }
 
 void EntityManager::Render(){
-    for(int layer = 0; layer<NUM_LAYERS; layer++){
+    for(unsigned int layer = 0; layer<NUM_LAYERS; layer++){
         for(const auto& entity: GetEntitiesByLayer(static_cast<LayerType>(layer))){
             entity->Render();
         }
@@ -59,18 +59,24 @@ void EntityManager::ListEntity() const{
     }
 }
 
-std::string EntityManager::CheckCollision(Entity &subjectEntity){
-    ColliderComponent* subjectCollider = subjectEntity.GetComponent<ColliderComponent>();
-    for (auto& entity : entities){
-        // Even though Tile should not have collision component
-        if(entity->name == "Tile" || entity->name == "Player")
-            continue;
-        // In this game so far, only "enemy&projectile" will collide
+CollisionType EntityManager::CheckCollision() const {
+    for (auto& entity : entities)
         if(entity->HasComponent<ColliderComponent>()){
-            ColliderComponent* otherCollider = entity->GetComponent<ColliderComponent>();
-            if(Collision::CheckCollision(subjectCollider->collider, otherCollider->collider))
-                return otherCollider->tag;
+            ColliderComponent* curCollider = entity->GetComponent<ColliderComponent>();
+            for(auto& otherEntity : entities)
+                if(otherEntity->HasComponent<ColliderComponent>() && otherEntity->name != entity->name){
+                    ColliderComponent* otherCollider = otherEntity->GetComponent<ColliderComponent>();
+                    if(Collision::CheckCollision(curCollider->collider,otherCollider->collider)){
+                        if(curCollider->tag=="PLAYER" && otherCollider->tag=="ENEMY")
+                            return PLAYER_ENEMY;
+                        if(curCollider->tag=="PLAYER" && otherCollider->tag=="PROJECTILE")
+                            return PLAYER_PROJECTILE;
+                        if(curCollider->tag=="ENEMY" && otherCollider->tag=="PROJECTILE")
+                            return ENEMY_PROJECTILE;
+                        if(curCollider->tag=="PLAYER" && otherCollider->tag=="LEVEL_COMPLETE")
+                            return PLAYER_LEVEL_COMPLETE;
+                    }
+                }
         }
-    }
-    return "";
+    return NONE;
 }

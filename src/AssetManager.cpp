@@ -10,7 +10,7 @@ void AssetManager::ClearData(){
 }
 
 void AssetManager::AddTexture(std::string textureId, const char* filePath){
-    textures[textureId] = TextureManager::LoadTexture(filePath);
+    textures.emplace(textureId,TextureManager::LoadTexture(filePath));
 }
 
 SDL_Texture* AssetManager::GetTexture(std::string textureId) {

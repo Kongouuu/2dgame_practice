@@ -21,9 +21,14 @@ class ColliderComponent: public Component {
         SDL_Texture* texture;
         TransformComponent* transform;
 
-        ColliderComponent(std::string textureId, std::string tag, int x, int y, int w, int h)
+        ColliderComponent(std::string tag, int w, int h)
         :tag(tag){
-            collider = {x,y,w,h};
+            collider = {0,0,w,h};
+        }
+
+        ColliderComponent(std::string textureId, std::string tag, int w, int h)
+        :tag(tag){
+            collider = {0,0,w,h};
             texture = Game::assetManager->GetTexture(textureId);
         }
 

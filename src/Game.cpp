@@ -79,23 +79,33 @@ void Game::LoadLevel(int levelNumber){
     assetManager->AddTexture("chopper-image", std::string("./assets/images/chopper-spritesheet.png").c_str());
     assetManager->AddTexture("radar-image", std::string("./assets/images/radar.png").c_str());
     assetManager->AddTexture("jungle-map", std::string("./assets/tilemaps/jungle.png").c_str());
+    assetManager->AddTexture("heliport-image", std::string("./assets/images/heliport.png").c_str());
     assetManager->AddTexture("collision-border", std::string("./assets/images/collision-texture.png").c_str());
 
     // Add map
     map = new Map("jungle-map",2,32);
     map->LoadMap("./assets/tilemaps/jungle.map",25,20);
 
+    
+
     // Adding entities&components
     Entity& tankEntity(manager.AddEntity("Tank",ENEMY_LAYER));
     tankEntity.AddComponent<TransformComponent>(0,0,20,0,32,32,1);
     tankEntity.AddComponent<SpriteComponent>("tank-image",false);
-    tankEntity.AddComponent<ColliderComponent>("collision-border","enemy",0,0,32,32);
+    tankEntity.AddComponent<ColliderComponent>("collision-border","ENEMY",32,32);
 
     player.AddComponent<TransformComponent>(400,300,0,0,32,32,1);
     player.AddComponent<SpriteComponent>("chopper-image",2,90,true,false); // (assetID, frames, speed, direction, fixed)
     player.AddComponent<KeyboardControlComponent>("up","down","left","right","fire");
-    player.AddComponent<ColliderComponent>("collision-border","player",400,300,32,32);
+    player.AddComponent<ColliderComponent>("collision-border","PLAYER",32,32);
 
+    // Add the heliport
+    Entity& heliportEntity(manager.AddEntity("Heliport",OBSTACLE_LAYER));
+    heliportEntity.AddComponent<TransformComponent>(470,420,0,0,32,32,1);
+    heliportEntity.AddComponent<SpriteComponent>("heliport-image");
+    heliportEntity.AddComponent<SpriteComponent>("heliport-image");
+    heliportEntity.AddComponent<ColliderComponent>("LEVEL_COMPLETE",32,32);
+    
     Entity& radarEntity(manager.AddEntity("Radar",UI_LAYER));
     radarEntity.AddComponent<TransformComponent>(720,15,0,0,64,64,1);
     radarEntity.AddComponent<SpriteComponent>("radar-image",8,300,false,true);
@@ -173,12 +183,27 @@ void Game::HandleCameraMovement(){
 }
 
 void Game::CheckCollision(){
-    std::string tag = manager.CheckCollision(player);
-    std::cout<<tag;
-    if(tag == "enemy"){
-        isRunning = false;
-        std::cout<<std::endl<<"Game End!"<<std::endl;
+    CollisionType collision = manager.CheckCollision();
+    switch(collision){
+        case PLAYER_ENEMY:
+            ProcessGameOver();
+            break;
+        case PLAYER_LEVEL_COMPLETE:
+            ProcessNextLevel();
+            break;
+        default:
+            break;
     }
+}
+
+void Game::ProcessGameOver(){
+    std::cout<<"Game Over!";
+    isRunning = false;
+}
+
+void Game::ProcessNextLevel(){
+    std::cout<<"Next Level!";
+    isRunning = false;
 }
 
 void Game::Destroy() {
