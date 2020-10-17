@@ -26,9 +26,9 @@ class Entity {
         void Update(float deltaTime);
         void Render();
         void Destroy();
+        void DestroyProjectile();
         void ListComponent() const;
         bool IsActive() const;
-
         template <typename T, typename... TArgs>
         T& AddComponent(TArgs&&... args){
             T* newComponent(new T(std::forward<TArgs>(args)...));

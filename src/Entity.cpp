@@ -27,6 +27,17 @@ void Entity::Destroy() {
     this->isActive = false;
 }
 
+/*void Entity::DestroyProjectile(){
+    Component* projectile;
+    if(projectile = this->GetComponent<ProjectileEmitComponent>()){
+        componentTypeMap.erase(&typeid(projectile));
+        for(int i=0; i<components.size();i++){
+            if(components[i]==projectile)
+                components.erase(components.begin()+i);
+        }
+    }
+}*/
+
 void Entity::ListComponent() const {
     for (auto& component : components) {
         component->List();

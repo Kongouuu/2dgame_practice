@@ -9,17 +9,18 @@
 #include "./Component.h"
 #include "./EntityManager.h"
 
+
 class AssetManager;
 
 class Game {
     private:
         bool isRunning;
-        int ticksLastFrame;
         SDL_Window *window;     // window of game
         
     public:
         Game(); //Constructor
         ~Game(); //Destructor
+        int ticksLastFrame;
         static AssetManager * assetManager;
         static SDL_Rect camera;
         static SDL_Event event; // input

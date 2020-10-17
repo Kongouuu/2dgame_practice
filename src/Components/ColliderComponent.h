@@ -8,10 +8,13 @@
 #include "./TransformComponent.h"
 #include "../AssetManager.h"
 
+
 /* 每个entity虽然transform里面有xyhw
  * 但实际上渲染的时候hitbox不在那个位置（因为调了camera)
  * 这就是给那个sprite加一层触碰判定
  */
+
+
 class ColliderComponent: public Component {
     public:
         std::string tag;
@@ -24,6 +27,7 @@ class ColliderComponent: public Component {
         ColliderComponent(std::string tag, int w, int h)
         :tag(tag){
             collider = {0,0,w,h};
+            texture = nullptr;
         }
 
         ColliderComponent(std::string textureId, std::string tag, int w, int h)
@@ -49,8 +53,10 @@ class ColliderComponent: public Component {
 
         void Render() override {
             // Hard coded so far
-            SDL_Rect borderTexture = {0,0,32,32};
-            TextureManager::Draw(texture, borderTexture, destinationRect, SDL_FLIP_NONE);
+            if(texture!=nullptr){
+                SDL_Rect borderTexture = {0,0,32,32};
+                TextureManager::Draw(texture, borderTexture, destinationRect, SDL_FLIP_NONE);
+            }
         }
 };
 

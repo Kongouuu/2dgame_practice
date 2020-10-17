@@ -9,6 +9,8 @@ void EntityManager::ClearData(){
     }
 }
 
+
+
 bool EntityManager::HasNoEntities() {
     return entities.size()==0;
 }
@@ -17,6 +19,16 @@ void EntityManager::Update(float deltaTime){
     for (auto& entity : entities){
         entity->Update(deltaTime);
     }
+    DestroyInactiveEntities();
+}
+
+void EntityManager::DestroyInactiveEntities(){
+    for(int i=0; i<entities.size(); i++){
+        if(!entities[i]->IsActive()){
+            entities.erase(entities.begin()+i);
+        }
+    }
+    
 }
 
 void EntityManager::Render(){
@@ -69,10 +81,11 @@ CollisionType EntityManager::CheckCollision() const {
                     if(Collision::CheckCollision(curCollider->collider,otherCollider->collider)){
                         if(curCollider->tag=="PLAYER" && otherCollider->tag=="ENEMY")
                             return PLAYER_ENEMY;
-                        if(curCollider->tag=="PLAYER" && otherCollider->tag=="PROJECTILE")
+                        if(curCollider->tag=="PLAYER" && otherCollider->tag=="ENEMY_PROJECTILE")
                             return PLAYER_PROJECTILE;
-                        if(curCollider->tag=="ENEMY" && otherCollider->tag=="PROJECTILE")
+                        if(curCollider->tag=="ENEMY" && otherCollider->tag=="PROJECTILE"){
                             return ENEMY_PROJECTILE;
+                        }
                         if(curCollider->tag=="PLAYER" && otherCollider->tag=="LEVEL_COMPLETE")
                             return PLAYER_LEVEL_COMPLETE;
                     }

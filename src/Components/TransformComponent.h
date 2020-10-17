@@ -5,6 +5,7 @@
 #include "../../lib/glm/glm.hpp"
 #include <SDL2/SDL.h>
 #include "../Game.h"
+#include "../Constants.h"
 
 // Inherit from Component
 class TransformComponent: public Component {
@@ -14,6 +15,8 @@ class TransformComponent: public Component {
         int width;
         int height;
         int scale;
+        bool hasDirection;
+        DirectionType direction;
         
         // Constructor
         TransformComponent(int posX, int posY, int velX, int velY, int w, int h, int s){
@@ -22,6 +25,16 @@ class TransformComponent: public Component {
             width = w;
             height = h;
             scale = s;
+        }
+
+        TransformComponent(int posX, int posY, int velX, int velY, int w, int h, int s, bool hasDirection){
+            position = glm::vec2(posX,posY);
+            velocity = glm::vec2(velX,velY);
+            width = w;
+            height = h;
+            scale = s;
+            this->hasDirection = hasDirection;
+            direction = DOWN;
         }
 
         void Initialize() override {

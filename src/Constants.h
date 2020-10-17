@@ -1,11 +1,13 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <SDL2/SDL.h>
 const unsigned int WINDOW_WIDTH = 800;
 const unsigned int WINDOW_HEIGHT = 600;
 const unsigned int FPS = 60;   // Target FPS
 const unsigned int FRAME_TARGET_TIME = 1000 / FPS;  // Time for each frame
 const unsigned int NUM_LAYERS = 7;
+const SDL_Color WHITE = {255,255,255,255};
 
 enum LayerType{
     TILEMAP_LAYER = 0,
@@ -24,6 +26,13 @@ enum CollisionType {
     ENEMY_PROJECTILE,
     PLAYER_VEGETATION,
     PLAYER_LEVEL_COMPLETE
+};
+
+enum DirectionType {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
 };
 
 #endif
