@@ -15,6 +15,7 @@ AssetManager* Game::assetManager = new AssetManager(&manager);
 SDL_Renderer* Game::renderer;
 SDL_Event Game::event;
 SDL_Rect Game::camera = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+Entity* player = nullptr;
 
 Map* map;
 // Constructor
@@ -69,61 +70,61 @@ void Game::Initialize(int width, int height) {
         return;
     }
 
-    LoadLevel(0);
+    LoadLevel(1);
     manager.ListEntity();
     // If no error, set running to true
     isRunning = true;
     return;
 };
 
-Entity& player(manager.AddEntity("Player", PLAYER_LAYER));
 
 void Game::LoadLevel(int levelNumber) {
-    // Load assets
-    assetManager->AddTexture("tank-image", std::string("./assets/images/tank-big-right.png").c_str());
-    assetManager->AddTexture("chopper-image", std::string("./assets/images/chopper-spritesheet.png").c_str());
-    assetManager->AddTexture("radar-image", std::string("./assets/images/radar.png").c_str());
-    assetManager->AddTexture("jungle-map", std::string("./assets/tilemaps/jungle.png").c_str());
-    assetManager->AddTexture("heliport-image", std::string("./assets/images/heliport.png").c_str());
-    assetManager->AddTexture("collision-border", std::string("./assets/images/collision-texture.png").c_str());
-    assetManager->AddTexture("projectile-image",std::string("./assets/images/bullet-enemy.png").c_str());
-    assetManager->AddFont("charriot-font",std::string("./assets/fonts/charriot.ttf").c_str(),14);
-    // Add map
-    map = new Map("jungle-map", 2, 32);
-    map->LoadMap("./assets/tilemaps/jungle.map", 25, 20);
-
-    // Adding entities&components
-    Entity& tankEntity(manager.AddEntity("Tank", ENEMY_LAYER));
-    tankEntity.AddComponent<TransformComponent>(450, 495, 0, 0, 32, 32, 1);
-    tankEntity.AddComponent<SpriteComponent>("tank-image", false);
-    tankEntity.AddComponent<ColliderComponent>("collision-border", "ENEMY", 32, 32);
-
+    sol::state lua;
+    lua.open_libraries(sol::lib::base, sol::lib::os, sol::lib::math);
     
-    Entity& projectileEntity(manager.AddEntity("Projectile",PROJECTILE_LAYER));
-    projectileEntity.AddComponent<TransformComponent>(450+16,495+16,0,0,4,4,1);
-    projectileEntity.AddComponent<SpriteComponent>("projectile-image");
-    projectileEntity.AddComponent<ColliderComponent>("ENEMY_PROJECTILE",4,4);
-    // (velocity, degree, range, loop or not)
-    projectileEntity.AddComponent<ProjectileEmitComponent>(120,270,240,true);
+    std::string level = "Level" + std::to_string(levelNumber);
+    lua.script_file("./assets/scripts/" + level + ".lua");
+    sol::table levelData = lua[level];
 
-    player.AddComponent<TransformComponent>(400, 300, 0, 0, 32, 32, 1);
-    player.AddComponent<SpriteComponent>("chopper-image", 2, 90, true, false);  // (assetID, frames, speed, direction, fixed)
-    player.AddComponent<KeyboardControlComponent>("up", "down", "left", "right", "fire");
-    player.AddComponent<ColliderComponent>("collision-border", "PLAYER", 32, 32);
+    /******************/
+    /* Loading Assets */
+    /******************/
+    sol::table levelAssets = levelData["assets"];
 
-    // Add the heliport
-    Entity& heliportEntity(manager.AddEntity("Heliport", OBSTACLE_LAYER));
-    heliportEntity.AddComponent<TransformComponent>(470, 420, 0, 0, 32, 32, 1);
-    heliportEntity.AddComponent<SpriteComponent>("heliport-image");
-    heliportEntity.AddComponent<SpriteComponent>("heliport-image");
-    heliportEntity.AddComponent<ColliderComponent>("LEVEL_COMPLETE", 32, 32);
+    unsigned int assetIndex = 0;
+    while(true){
+        // Check exists
+        sol::optional<sol::table> existsAssetNode = levelAssets[assetIndex];
+        if (existsAssetNode == sol::nullopt){
+            break;
+        }
+        else {
+            // If asset exist
+            sol::table asset = levelAssets[assetIndex];
+            std::string assetType = asset["type"];
+            // If asset type is a texture
+            if (assetType == "texture"){
+                std::string assetId = asset["id"];
+                std::string assetFile = asset["file"];
+                assetManager->AddTexture(assetId,assetFile.c_str());
+            }
+        }
+        assetIndex++;
+    }
 
-    Entity& radarEntity(manager.AddEntity("Radar", UI_LAYER));
-    radarEntity.AddComponent<TransformComponent>(720, 15, 0, 0, 64, 64, 1);
-    radarEntity.AddComponent<SpriteComponent>("radar-image", 8, 300, false, true);
+    /******************/
+    /* Loading Map */
+    /******************/
+    sol::table levelMap = levelData["map"];
+    std::string mapTextureId = levelMap["textureAssetId"];
+    std::string mapFile = levelMap["file"];
 
-    Entity& labelEntity(manager.AddEntity("Label", UI_LAYER));
-    labelEntity.AddComponent<LabelComponent>(400,100,"Yes","charriot-font", WHITE);
+    map = new Map(mapTextureId, static_cast<int>(levelMap["scale"]), static_cast<int>(levelMap["tileSize"]));
+    map->LoadMap(mapFile, static_cast<int>(levelMap["mapSizeX"]), static_cast<int>(levelMap["mapSizeY"]));
+    /******************/
+    /* Loading Assets */
+    /******************/
+    std::cout<<"giao";
 }
 
 // Input processor
@@ -182,17 +183,19 @@ void Game::Render() {
 };
 
 void Game::HandleCameraMovement() {
-    TransformComponent* playerPos = player.GetComponent<TransformComponent>();
-    // Keep the player in the middle of the screen
-    camera.x = playerPos->position.x - (WINDOW_WIDTH / 2);
-    camera.y = playerPos->position.y - (WINDOW_HEIGHT / 2);
+    if(player){
+        TransformComponent* playerPos = player->GetComponent<TransformComponent>();
+        // Keep the player in the middle of the screen
+        camera.x = playerPos->position.x - (WINDOW_WIDTH / 2);
+        camera.y = playerPos->position.y - (WINDOW_HEIGHT / 2);
 
-    // If player position - half window < 0, dont move camera
-    camera.x = camera.x < 0 ? 0 : camera.x;
-    camera.y = camera.y < 0 ? 0 : camera.y;
-    // If reached outer border, stop camera at outer border
-    camera.x = playerPos->position.x + (WINDOW_WIDTH / 2) > map->GetWidth() ? map->GetWidth() - WINDOW_WIDTH : camera.x;
-    camera.y = playerPos->position.y + (WINDOW_HEIGHT / 2) > map->GetHeight() ? map->GetHeight() - WINDOW_HEIGHT : camera.y;
+        // If player position - half window < 0, dont move camera
+        camera.x = camera.x < 0 ? 0 : camera.x;
+        camera.y = camera.y < 0 ? 0 : camera.y;
+        // If reached outer border, stop camera at outer border
+        camera.x = playerPos->position.x + (WINDOW_WIDTH / 2) > map->GetWidth() ? map->GetWidth() - WINDOW_WIDTH : camera.x;
+        camera.y = playerPos->position.y + (WINDOW_HEIGHT / 2) > map->GetHeight() ? map->GetHeight() - WINDOW_HEIGHT : camera.y;
+    }
 }
 
 void Game::CheckCollision() {

@@ -6,7 +6,6 @@
 extern EntityManager manager;
 Map::Map(std::string textureId, int scale, int tileSize)
     :textureId(textureId), tileScale(scale), tileSize(tileSize){
-       newMap = &(manager.AddEntity("Tile",TILEMAP_LAYER));
        // Originally empty
 }
 
@@ -44,6 +43,6 @@ int Map::GetHeight(){
 
 }
 void Map::AddTile(int sourceRectX, int sourceRectY, int x, int y){
-    // Entity& newTile(manager.AddEntity("Tile"));
-    newMap->AddComponent<TileComponent>(sourceRectX,sourceRectY,x,y,tileSize,tileScale,textureId);
+    Entity& newTile(manager.AddEntity("Tile",TILEMAP_LAYER));
+    newTile.AddComponent<TileComponent>(sourceRectX,sourceRectY,x,y,tileSize,tileScale,textureId);
 };

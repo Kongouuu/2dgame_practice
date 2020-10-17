@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include "../lib/lua/sol.hpp" // Very cool lua framework
 #include "./Constants.h"
 #include "./Entity.h"
 #include "./Component.h"
