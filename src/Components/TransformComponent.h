@@ -17,15 +17,6 @@ class TransformComponent: public Component {
         int scale;
         bool hasDirection;
         DirectionType direction;
-        
-        // Constructor
-        TransformComponent(int posX, int posY, int velX, int velY, int w, int h, int s){
-            position = glm::vec2(posX,posY);
-            velocity = glm::vec2(velX,velY);
-            width = w;
-            height = h;
-            scale = s;
-        }
 
         TransformComponent(int posX, int posY, int velX, int velY, int w, int h, int s, bool hasDirection){
             position = glm::vec2(posX,posY);

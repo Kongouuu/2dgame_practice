@@ -81,7 +81,7 @@ CollisionType EntityManager::CheckCollision() const {
                     if(Collision::CheckCollision(curCollider->collider,otherCollider->collider)){
                         if(curCollider->tag=="PLAYER" && otherCollider->tag=="ENEMY")
                             return PLAYER_ENEMY;
-                        if(curCollider->tag=="PLAYER" && otherCollider->tag=="ENEMY_PROJECTILE")
+                        if(curCollider->tag=="PLAYER" && otherCollider->tag=="PROJECTILE")
                             return PLAYER_PROJECTILE;
                         if(curCollider->tag=="ENEMY" && otherCollider->tag=="PROJECTILE"){
                             return ENEMY_PROJECTILE;
